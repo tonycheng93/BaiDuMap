@@ -9,7 +9,7 @@ import com.baidu.mapapi.SDKInitializer;
  * Created by Administrator on 2015/9/2.
  */
 public class MapApplication extends Application{
-    private static Context context;
+    public static Context context;
 
     @Override
     public void onCreate() {
