@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
                 LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(latLng);
                 mBaiduMap.animateMapStatus(update);//使用动画
-//                Toast.makeText(this,location.getAddrStr(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,location.getAddrStr(),Toast.LENGTH_SHORT).show();
             }
         }
     }
