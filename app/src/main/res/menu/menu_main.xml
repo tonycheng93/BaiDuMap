@@ -2,8 +2,16 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MainActivity">
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
+    <item android:id="@+id/id_map_normal"
+          android:title="普通地图"
           android:orderInCategory="100"
           app:showAsAction="never"/>
+      <item android:id="@+id/id_map_site"
+            android:title="卫星地图"
+            android:orderInCategory="100"
+            app:showAsAction="never"/>
+      <item android:id="@+id/id_map_traffic"
+            android:title="实时交通(off)"
+            android:orderInCategory="100"
+            app:showAsAction="never"/>
 </menu>
