@@ -5,6 +5,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -76,6 +77,7 @@ public class MainActivity extends Activity {
                 LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(latLng);
                 mBaiduMap.animateMapStatus(update);//使用动画
+//                Toast.makeText(this,location.getAddrStr(),Toast.LENGTH_SHORT).show();
             }
         }
     }
