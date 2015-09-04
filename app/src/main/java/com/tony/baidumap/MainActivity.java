@@ -47,7 +47,8 @@ public class MainActivity extends Activity {
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true);// 打开gps
         option.setCoorType("bd09ll");// 设置坐标类型
-        option.setScanSpan(1000);
+        option.setIsNeedAddress(true);
+        option.setScanSpan(1000);//每隔几秒请求一次
         mLocClient.setLocOption(option);
         mLocClient.start();
     }
@@ -64,16 +65,17 @@ public class MainActivity extends Activity {
                 return;
             }
             MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
+                    .accuracy(location.getRadius())//定位精度
                     // 此处设置开发者获取到的方向信息，顺时针0-360
             .direction(100).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
+            //是否是第一次定位
             if (isFirstLoc){
                 isFirstLoc = false;
                 LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(latLng);
-                mBaiduMap.animateMapStatus(update);
+                mBaiduMap.animateMapStatus(update);//使用动画
             }
         }
     }
@@ -90,6 +92,23 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         mapView.onPause();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //开始定位
+        mBaiduMap.setMyLocationEnabled(true);
+        if (! mLocClient.isStarted())
+        mLocClient.start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //停止定位
+        mBaiduMap.setMyLocationEnabled(false);
+        mLocClient.stop();
     }
 
     @Override
