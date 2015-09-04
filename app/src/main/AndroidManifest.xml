@@ -19,9 +19,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+<!--        <meta-data
+            android:name="com.baidu.lbsapi.API_KEY"
+            android:value="T7HL8jABb6s3ebjrGmqv6BB4" />-->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="T7HL8jABb6s3ebjrGmqv6BB4" />
+            android:value="wHPxAQ7TCMaa0xrpSrAxcODa" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
