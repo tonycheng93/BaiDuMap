@@ -1,14 +1,10 @@
 package com.tony.baidumap;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.renderscript.Allocation;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -21,17 +17,11 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
-import java.util.List;
-
 public class MainActivity extends Activity {
 
     private MapView mapView;
-
-    private LocationManager manager;
-    private String provider;
-
     private BaiduMap mBaiduMap;
-    //定位相关
+    //定位相关(定位API)
     private LocationClient mLocClient;
     public MyLocationListenner myListener = new MyLocationListenner();
 
@@ -44,6 +34,10 @@ public class MainActivity extends Activity {
 
         mapView = (MapView) findViewById(R.id.bmapView);
         mBaiduMap = mapView.getMap();
+
+        //设置地图显示的比例大小
+        MapStatusUpdate msu = MapStatusUpdateFactory.zoomTo(15.0f);
+        mBaiduMap.setMapStatus(msu);
 
         //开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
@@ -84,6 +78,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    //重写生命周期方法，管理百度地图,使百度地图的生命周期与Activity保持一致
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
     @Override
     protected void onDestroy() {
         // 退出时销毁定位
@@ -93,5 +101,35 @@ public class MainActivity extends Activity {
         mapView.onDestroy();
         mapView = null;
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.id_map_normal:
+                mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
+                break;
+            case R.id.id_map_site:
+                mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
+                break;
+            case R.id.id_map_traffic:
+                if (mBaiduMap.isTrafficEnabled()){
+                    mBaiduMap.setTrafficEnabled(false);
+                    item.setTitle("实时交通(off)");
+                }else {
+                    mBaiduMap.setTrafficEnabled(true);
+                    item.setTitle("实时交通(on)");
+                }
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
