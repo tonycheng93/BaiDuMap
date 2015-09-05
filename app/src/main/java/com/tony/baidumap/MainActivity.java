@@ -27,6 +27,9 @@ public class MainActivity extends Activity {
 
     private boolean isFirstLoc = true;// 是否首次定位
 
+    private double mLatitude;
+    private double mLongitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +73,9 @@ public class MainActivity extends Activity {
             .direction(100).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
+            //更新经纬度
+            mLatitude = location.getLatitude();
+            mLongitude = location.getLongitude();
             //是否是第一次定位
             if (isFirstLoc){
                 isFirstLoc = false;
@@ -147,9 +153,18 @@ public class MainActivity extends Activity {
                     item.setTitle("实时交通(on)");
                 }
                 break;
+            case R.id.id_map_location:
+                centerToMyLocation(mLatitude, mLongitude);
+                break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void centerToMyLocation(double latitude, double longitude) {
+        LatLng latLng = new LatLng(latitude, longitude);
+        MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latLng);
+        mBaiduMap.animateMapStatus(msu);
     }
 }
