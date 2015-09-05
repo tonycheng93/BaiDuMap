@@ -11,9 +11,12 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 
@@ -29,6 +32,11 @@ public class MainActivity extends Activity {
 
     private double mLatitude;
     private double mLongitude;
+
+    //自定义定位图标
+    private BitmapDescriptor mIconLocation;
+    private MyOrientationListener mMyOrientationListener;
+    private float mCurrentX;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +61,16 @@ public class MainActivity extends Activity {
         option.setIsNeedAddress(true);
         option.setScanSpan(1000);//每隔几秒请求一次
         mLocClient.setLocOption(option);
+        //初始化定位图标
+        mIconLocation = BitmapDescriptorFactory.
+                fromResource(R.drawable.navi_map_gps_locked);
+        mMyOrientationListener = new MyOrientationListener(this);
+        mMyOrientationListener.setOnOrientationListener(new MyOrientationListener.OnOrientationListener() {
+            @Override
+            public void onOrientationChanged(float x) {
+                mCurrentX = x;
+            }
+        });
         mLocClient.start();
     }
 
@@ -64,25 +82,30 @@ public class MainActivity extends Activity {
         @Override
         public void onReceiveLocation(BDLocation location) {
             // map view 销毁后不在处理新接收的位置
-            if (location == null && mapView == null){
+            if (location == null && mapView == null) {
                 return;
             }
             MyLocationData locData = new MyLocationData.Builder()
                     .accuracy(location.getRadius())//定位精度
-                    // 此处设置开发者获取到的方向信息，顺时针0-360
-            .direction(100).latitude(location.getLatitude())
+                            // 此处设置开发者获取到的方向信息，顺时针0-360
+                    .direction(mCurrentX).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);
+            //设置自定义图标
+            MyLocationConfiguration config = new
+                    MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL,
+                    true, mIconLocation);
+            mBaiduMap.setMyLocationConfigeration(config);
             //更新经纬度
             mLatitude = location.getLatitude();
             mLongitude = location.getLongitude();
             //是否是第一次定位
-            if (isFirstLoc){
+            if (isFirstLoc) {
                 isFirstLoc = false;
-                LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(latLng);
                 mBaiduMap.animateMapStatus(update);//使用动画
-                Toast.makeText(MainActivity.this,location.getAddrStr(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, location.getAddrStr(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -106,8 +129,10 @@ public class MainActivity extends Activity {
         super.onStart();
         //开始定位
         mBaiduMap.setMyLocationEnabled(true);
-        if (! mLocClient.isStarted())
-        mLocClient.start();
+        if (!mLocClient.isStarted())
+            mLocClient.start();
+        //开启方向传感器
+        mMyOrientationListener.start();
     }
 
     @Override
@@ -116,6 +141,8 @@ public class MainActivity extends Activity {
         //停止定位
         mBaiduMap.setMyLocationEnabled(false);
         mLocClient.stop();
+        //停止方向传感器
+        mMyOrientationListener.stop();
     }
 
     @Override
@@ -131,13 +158,13 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main,menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.id_map_normal:
                 mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
                 break;
@@ -145,10 +172,10 @@ public class MainActivity extends Activity {
                 mBaiduMap.setMapType(BaiduMap.MAP_TYPE_SATELLITE);
                 break;
             case R.id.id_map_traffic:
-                if (mBaiduMap.isTrafficEnabled()){
+                if (mBaiduMap.isTrafficEnabled()) {
                     mBaiduMap.setTrafficEnabled(false);
                     item.setTitle("实时交通(off)");
-                }else {
+                } else {
                     mBaiduMap.setTrafficEnabled(true);
                     item.setTitle("实时交通(on)");
                 }
@@ -162,6 +189,12 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * 定位到我的位置
+     *
+     * @param latitude
+     * @param longitude
+     */
     private void centerToMyLocation(double latitude, double longitude) {
         LatLng latLng = new LatLng(latitude, longitude);
         MapStatusUpdate msu = MapStatusUpdateFactory.newLatLng(latLng);
