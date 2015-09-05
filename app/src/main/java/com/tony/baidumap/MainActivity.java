@@ -1,7 +1,6 @@
 package com.tony.baidumap;
 
 import android.app.Activity;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
