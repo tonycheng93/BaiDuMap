@@ -14,4 +14,8 @@
             android:title="实时交通(off)"
             android:orderInCategory="100"
             app:showAsAction="never"/>
+    <item android:id="@+id/id_map_location"
+            android:title="我的位置"
+            android:orderInCategory="100"
+            app:showAsAction="never"/>
 </menu>
